@@ -1,0 +1,529 @@
+
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CornVault Integrado</title>
+  
+<style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #121212;
+    color: #f0f0f0;
+    text-align: center;
+  }
+  .top {
+    background: #1e1e1e;
+    color: #4ade80;
+    padding: 15px 20px;
+    font-size: 24px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6);
+  }
+  #userInfo {
+    font-size: 18px;
+    color: #f0f0f0;
+    padding: 5px;
+  }
+  .section {
+    margin: 20px auto;
+    max-width: 600px;
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+  }
+  .btn {
+    background: #4ade80;
+    color: #121212;
+    border: none;
+    padding: 12px 24px;
+    margin: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  .btn:hover {
+    background: #34d399;
+  }
+  .nav {
+    visibility: hidden;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:60px;
+    background:#1e1e1e;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    border-top:1px solid #333;
+  }
+  .nav button {
+    background:none;
+    border:none;
+    color: #f0f0f0;
+    font-size:22px;
+  }
+  input {
+    background: #2c2c2c;
+    border: none;
+    color: white;
+    padding: 10px;
+    width: 80%;
+    border-radius: 8px;
+    margin: 5px 0;
+  }
+  #pvpLog {
+    margin-top: 15px;
+    font-weight: bold;
+    color: #4ade80;
+  }
+
+#splash {
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:#121212;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+}
+#splash.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+</style>
+
+</head>
+<body onload="startSplash()">
+<div id="splash" style="position:fixed;top:0;left:0;right:0;bottom:0;background:#fffef8;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;">
+  <div style="font-size:36px;font-weight:bold;color:#4ade80;">CornVault</div>
+  <div style="font-size:50px; animation: pulse 1.5s infinite;">🌽</div>
+</div>
+
+<div id="login" style="display:none;padding:30px;">
+  <h2>Entrar no CornVault</h2>
+  <input id="email" placeholder="Email" style="margin:10px;padding:10px;width:80%;"><br>
+  <input id="password" type="password" placeholder="Password" style="margin:10px;padding:10px;width:80%;"><br>
+  <button onclick="login()" class="btn">Entrar</button>
+  <button onclick="createAccount()" class="btn">Criar Conta</button>
+</div>
+
+<div class="top" id="topBar" style="display:none;">CornVault</div>
+
+<div class="avatar-bar" style="position:absolute;top:15px;right:15px;">
+  <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=User" alt="Avatar" style="width:40px;height:40px;border-radius:50%;border:2px solid #4ade80;">
+</div>
+
+<div id="userInfo" style="margin: 10px; font-weight: bold; display:none;">Saldo: <span id="corns">100.0000</span> CORNs</div>
+
+<div class="section" id="hub" style="display:none;">
+  <h3>Resumo Económico</h3>
+  <canvas id="cornChart" width="300" height="200"></canvas>
+  <p><strong>Em circulação:</strong> 1.233.456 CORNs</p>
+  <p><strong>Jogadores:</strong> 128</p>
+  <p><strong>Teu nível:</strong> Agricultor Bronze</p>
+</div>
+
+
+<div class="section" id="field" style="display:none;">
+  <h3>🌽 Campo de Milhos</h3>
+  <p>Milhos plantados: 🌽🌽🌽</p>
+  <p>Rendimento estimado: 0.0003 CORN por milho a cada 5 segundos</p>
+  <button id="buyFieldBtn" class="btn" onclick="buyField()">Comprar Terreno (30 CORNs)</button>
+  <button id="buyMilhoBtn" class="btn" onclick="buyMilho()" style="display:none;">Comprar Milho (<span id="milhoPrice">5.00</span> CORNs)</button>
+</div>
+
+<div class="section" id="pvp" style="display:none;">
+  <h3>⚔️ Modo PVP</h3>
+  <p>🦠 Atacar inimigo (5 CORNs): 49.99% sucesso</p>
+  <p>🛡️ Comprar repelente (protege 3 ataques): 10 CORNs</p>
+  <button class="btn" onclick="attack()">Atacar</button>
+  <button class="btn" onclick="buyRepellent()">Comprar Repelente</button>
+  <div id="pvpLog" style="margin-top:10px;"></div>
+</div>
+
+<div class="section" id="terms" style="display:none;">
+  <h3>📄 Termos e Condições</h3>
+  <p>Simulação digital. Nenhuma transação real é efetuada nesta app.</p>
+</div>
+
+<div class="section" id="support" style="display:none;">
+  <h3>🛟 Suporte</h3>
+  <p>Email: suporte@cornvault.com</p>
+</div>
+
+
+<div class="nav" id="navBar" style="visibility:hidden; display:none; flex-direction: column; position: fixed; top: 60px; left: 0; width: 100px; height: calc(100% - 60px); background: #1e1e1e; align-items: center; padding-top: 20px;">
+  <button onclick="show('hub')" title="Início">🏠</button>
+  <button onclick="show('field')" title="Campo">🌾</button>
+  <button onclick="show('pvp')" title="PvP">⚔️</button>
+  <button onclick="show('terms')" title="Termos">📄</button>
+  <button onclick="show('support')" title="Suporte">🛟</button>
+</div>
+
+  <button onclick="show('hub')">🏠</button>
+  <button onclick="show('field')">🌾</button>
+  <button onclick="show('pvp')">⚔️</button>
+  <button onclick="show('terms')">📄</button>
+  <button onclick="show('support')">🛟</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  let userCorns = parseFloat(localStorage.getItem("corns")) || 0;
+  let hasField = localStorage.getItem("hasField") === "true";
+  let cornHistory = [];
+  let cornInterval;
+  let historyInterval;
+  let pvpSpinning = false;
+  let numberOfMilhos = parseInt(localStorage.getItem("milhos")) || 0;
+  let milhoBaseCost = 5.0;
+
+  function updateCornsDisplay(animated = false, gain = 0) {
+    const el = document.getElementById("corns");
+    el.innerText = userCorns.toFixed(4);
+    localStorage.setItem("corns", userCorns);
+
+    if (animated && gain > 0) {
+      const anim = document.createElement("span");
+      anim.innerText = ` +${gain.toFixed(4)} CORNs`;
+      anim.style.color = "green";
+      anim.style.marginLeft = "10px";
+      anim.style.fontWeight = "bold";
+      el.parentElement.appendChild(anim);
+      setTimeout(() => anim.remove(), 2000);
+    }
+  }
+
+  function startEarnings() {
+    if (!cornInterval) {
+      cornInterval = setInterval(() => {
+        if (hasField && numberOfMilhos > 0) {
+          const gain = numberOfMilhos * 0.0003;
+          userCorns += gain;
+          updateCornsDisplay(true, gain);
+        }
+      }, 5000);
+    }
+  }
+
+  function startHistoryLogging() {
+    if (!historyInterval) {
+      historyInterval = setInterval(() => {
+        cornHistory.push({ time: new Date(), value: userCorns });
+        if (cornHistory.length > 259200) cornHistory.shift(); // 15 dias de 5s logs
+      }, 5000);
+    }
+  }
+
+  
+let cornChart;
+function drawChart() {
+  const ctx = document.getElementById('cornChart').getContext('2d');
+  const labels = cornHistory.map(item => item.time.toLocaleTimeString());
+  const data = cornHistory.map(item => item.value.toFixed(4));
+
+  if (!cornChart) {
+    cornChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Saldo CORN',
+          data,
+          borderColor: '#4ade80',
+          fill: false,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        animation: false,
+        plugins: { legend: { display: false }},
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  } else {
+    cornChart.data.labels = labels;
+    cornChart.data.datasets[0].data = data;
+    cornChart.update();
+  }
+}
+
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Saldo CORN',
+          data,
+          borderColor: '#2c6e49',
+          fill: false,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }},
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  function getRandomInternationalOpponent() {
+    const prefixes = ["Corn", "Harvest", "Golden", "Agro", "Field", "Kernel"];
+    const suffixes = ["King", "Dream", "Crush", "Lord", "Farmer", "Master"];
+    const number = Math.floor(Math.random() * 99).toString().padStart(2, '0');
+    const name = prefixes[Math.floor(Math.random() * prefixes.length)] + suffixes[Math.floor(Math.random() * suffixes.length)] + number;
+    return name;
+  }
+
+  function attack() {
+    if (pvpSpinning) return;
+    if (userCorns < 5) {
+      document.getElementById("pvpLog").innerText = "Não tens CORNs suficientes para atacar!";
+      return;
+    }
+
+    pvpSpinning = true;
+    const opponent = getRandomInternationalOpponent();
+    userCorns -= 5;
+    updateCornsDisplay();
+
+    const pvpLog = document.getElementById("pvpLog");
+    pvpLog.innerHTML = "A rodar resultado...";
+
+    setTimeout(() => {
+      const chance = Math.random();
+      const success = chance < 0.4999;
+      const msg = success
+        ? `Vitória contra ${opponent}! +3 CORNs`
+        : `Falhaste o ataque contra ${opponent}.`;
+      if (success) userCorns += 3;
+      updateCornsDisplay();
+      pvpLog.innerHTML = `<div style="font-size:18px;">${msg}<br>Chance: ${(chance * 100).toFixed(2)}%</div>`;
+      pvpSpinning = false;
+    }, 2000);
+  }
+
+  function buyRepellent() {
+    if (userCorns < 10) {
+      document.getElementById("pvpLog").innerText = "Não tens CORNs suficientes para comprar repelente!";
+      return;
+    }
+    userCorns -= 10;
+    updateCornsDisplay();
+    document.getElementById("pvpLog").innerText = "🛡️ Repelente comprado. Protege-te de 3 ataques.";
+  }
+
+  function buyField() {
+    if (hasField) {
+      alert("Já tens terreno.");
+      return;
+    }
+    if (userCorns < 30) {
+      alert("Não tens CORNs suficientes para comprar terreno!");
+      return;
+    }
+    userCorns -= 30;
+    hasField = true;
+    localStorage.setItem("hasField", "true");
+    updateCornsDisplay();
+    alert("Terreno comprado! Agora podes plantar milhos.");
+    document.getElementById("buyMilhoBtn").style.display = "inline-block";
+    document.getElementById("buyFieldBtn").style.display = "none";
+  }
+
+  
+  function updateMilhoPrice() {
+    const price = milhoBaseCost * Math.pow(1.7, numberOfMilhos);
+    document.getElementById("milhoPrice").innerText = price.toFixed(2);
+  }
+
+  function buyMilho() {
+    const price = milhoBaseCost * Math.pow(1.7, numberOfMilhos);
+    if (userCorns < price) {
+      alert("Não tens CORNs suficientes para comprar milho!");
+      return;
+    }
+    userCorns -= price;
+    numberOfMilhos += 1;
+    localStorage.setItem("milhos", numberOfMilhos);
+    updateCornsDisplay();
+    alert(`Compraste mais 1 milho! Total: ${numberOfMilhos}`);
+    updateMilhoPrice();
+  }
+
+  
+function startSplash() {
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.classList.add("fade-out");
+    setTimeout(() => {
+      splash.style.display = 'none';
+      document.getElementById('login').style.display = 'block';
+    }, 1000); // Esperar o fade-out terminar
+  }, 2000);
+}
+, 2000);
+  }
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    if (localStorage.getItem("email") === email && localStorage.getItem("password") === password) {
+      startApp();
+    } else {
+      alert("Credenciais inválidas.");
+    }
+  }
+
+  function createAccount() {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    if (email && password) {
+      localStorage.setItem("email", email);
+      localStorage.setItem("password", password);
+      localStorage.setItem("corns", "100.0");
+      localStorage.setItem("hasField", "false");
+      localStorage.setItem("milhos", "0");
+      userCorns = 100.0;
+      hasField = false;
+      numberOfMilhos = 0;
+      startApp();
+    } else {
+      alert("Preenche os dados.");
+    }
+  }
+
+  function startApp() {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("topBar").style.display = "block";
+    document.getElementById("userInfo").style.display = "block";
+    document.getElementById("navBar").style.visibility = "visible";
+    document.getElementById("navBar").style.display = "flex";
+    if (hasField) {
+      document.getElementById("buyFieldBtn").style.display = "none";
+      document.getElementById("buyMilhoBtn").style.display = "inline-block";
+    }
+    updateCornsDisplay();
+    startEarnings();
+    startHistoryLogging();
+    setInterval(drawChart, 1000);
+    updateMilhoPrice();
+    show("hub");
+    drawChart();
+  }
+
+  function show(section) {
+    document.querySelectorAll(".section").forEach(s => s.style.display = "none");
+    document.getElementById(section).style.display = "block";
+    if (section === "hub") drawChart();
+  }
+</script>
+
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1LoPAQ3pV53F5jUT5gAHmfCqodabrzoI",
+    authDomain: "cornvault-35471.firebaseapp.com",
+    projectId: "cornvault-35471",
+    storageBucket: "cornvault-35471.firebasestorage.app",
+    messagingSenderId: "145895221221",
+    appId: "1:145895221221:web:cf528adb1e31226798b10c",
+    measurementId: "G-K3C48DXJ66"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.firebaseStartApp = function(data) {
+    userCorns = data.corns;
+    hasField = data.hasField;
+    numberOfMilhos = data.milhos;
+
+    document.getElementById("login").style.display = "none";
+    document.getElementById("topBar").style.display = "block";
+    document.getElementById("userInfo").style.display = "block";
+    document.getElementById("navBar").style.visibility = "visible";
+    document.getElementById("navBar").style.display = "flex";
+
+    if (hasField) {
+      document.getElementById("buyFieldBtn").style.display = "none";
+      document.getElementById("buyMilhoBtn").style.display = "inline-block";
+    }
+
+    updateCornsDisplay();
+    startEarnings();
+    startHistoryLogging();
+    show("hub");
+    drawChart();
+  };
+
+  async function saveUserData(uid, data) {
+    await setDoc(doc(db, "users", uid), data);
+  }
+
+  async function loadUserData(uid) {
+    const docSnap = await getDoc(doc(db, "users", uid));
+    if (docSnap.exists()) {
+      return docSnap.data();
+    } else {
+      return null;
+    }
+  }
+
+  window.firebaseCreateAccount = async function(email, password) {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+      const initialData = { corns: 100.0, hasField: false, milhos: 0 };
+      await saveUserData(uid, initialData);
+      window.firebaseStartApp(initialData);
+    } catch (error) {
+      alert("Erro ao criar conta: " + error.message);
+      document.getElementById("login").style.display = "block";
+    }
+  }
+
+  window.firebaseLogin = async function(email, password) {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+      const userData = await loadUserData(uid);
+      if (userData) {
+        window.firebaseStartApp(userData);
+      } else {
+        alert("Utilizador sem dados guardados.");
+        document.getElementById("login").style.display = "block";
+      }
+    } catch (error) {
+      alert("Erro ao entrar: " + error.message);
+      document.getElementById("login").style.display = "block";
+    }
+  }
+
+  // Verificação automática de sessão
+  document.getElementById("login").style.display = "block";
+</script>
+</body>
+</html>
