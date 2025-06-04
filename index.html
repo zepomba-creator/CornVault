@@ -1,798 +1,1219 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CornVault - Digital Corn Economy</title>
   <meta name="description" content="Manage your digital corn assets and grow your virtual farm">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
   
-<style>
-  :root {
-    --primary: #2ecc71;
-    --primary-dark: #27ae60;
-    --secondary: #3498db;
-    --dark: #121212;
-    --darker: #0d0d0d;
-    --light: #f8f9fa;
-    --gray: #2c3e50;
-    --light-gray: #ecf0f1;
-    --danger: #e74c3c;
-    --warning: #f39c12;
-    --success: #2ecc71;
-    --border-radius: 16px;
-    --box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-    --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    background: var(--dark);
-    color: var(--light);
-    line-height: 1.6;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-  }
-
-  /* Splash Screen */
-  #splash {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--darker);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease;
-  }
-
-  .splash-content {
-    text-align: center;
-    animation: fadeIn 1s ease;
-  }
-
-  .splash-logo {
-    font-size: 3rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .splash-icon {
-    font-size: 4rem;
-    animation: bounce 2s infinite;
-  }
-
-  /* Auth Container */
-  .auth-container {
-    max-width: 480px;
-    margin: 2rem auto;
-    padding: 2rem;
-    background: var(--darker);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    display: none;
-  }
-
-  .auth-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
-  .auth-logo {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .auth-title {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--light);
-  }
-
-  .auth-subtitle {
-    color: var(--light-gray);
-    margin-bottom: 2rem;
-  }
-
-  /* Form Elements */
-  .form-group {
-    margin-bottom: 1.5rem;
-  }
-
-  .form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--light-gray);
-    font-weight: 500;
-  }
-
-  .form-control {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: var(--border-radius);
-    color: var(--light);
-    font-size: 1rem;
-    transition: var(--transition);
-  }
-
-  .form-control:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.2);
-  }
-
-  /* Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: var(--border-radius);
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    text-decoration: none;
-    gap: 0.5rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-primary {
-    background: var(--primary);
-    color: var(--dark);
-    box-shadow: 0 4px 0 #1e8449;
-  }
-
-  .btn-primary:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 0 #1e8449;
-  }
-
-  .btn-primary:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 0 #1e8449;
-  }
-
-  .btn-secondary {
-    background: var(--gray);
-    color: var(--light);
-    box-shadow: 0 4px 0 #2c3e50;
-  }
-
-  .btn-secondary:hover {
-    background: #34495e;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 0 #2c3e50;
-  }
-
-  .btn-secondary:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 0 #2c3e50;
-  }
-
-  .btn-block {
-    display: flex;
-    width: 100%;
-  }
-
-  .btn-group {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  /* App Layout */
-  .app-container {
-    display: none;
-    flex: 1;
-    padding-bottom: 80px;
-  }
-
-  .app-header {
-    background: var(--darker);
-    color: var(--primary);
-    padding: 1rem;
-    font-size: 1.5rem;
-    font-weight: 700;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-  }
-
-  .user-info {
-    font-size: 1rem;
-    color: var(--light);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .user-balance {
-    font-weight: 600;
-    color: var(--primary);
-  }
-
-  /* Profile Bubble */
-  .profile-bubble {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    overflow: hidden;
-    border: 2px solid var(--light);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-
-  .profile-bubble img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .profile-bubble i {
-    font-size: 1.2rem;
-    color: white;
-  }
-
-  /* Profile Modal */
-  .profile-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-
-  .profile-modal.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .profile-content {
-    background: var(--darker);
-    border-radius: var(--border-radius);
-    padding: 2rem;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: var(--box-shadow);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-  }
-
-  .profile-modal.active .profile-content {
-    transform: translateY(0);
-  }
-
-  .profile-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .profile-pic {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--gray);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border: 3px solid var(--primary);
-    cursor: pointer;
-  }
-
-  .profile-pic i {
-    font-size: 2rem;
-    color: var(--light-gray);
-  }
-
-  .profile-pic img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Sections */
-  .section {
-    margin: 1.5rem auto;
-    max-width: 800px;
-    background: var(--darker);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--box-shadow);
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    color: var(--primary);
-  }
-
-  .section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-  }
-
-  .section-icon {
-    font-size: 1.75rem;
-  }
-
-  .section-body {
-    margin-top: 1rem;
-  }
-
-  /* Stats Cards */
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .stat-card {
-    background: rgba(255,255,255,0.05);
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    text-align: center;
-    transition: transform 0.3s ease;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255,255,255,0.08);
-  }
-
-  .stat-value {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin-bottom: 0.25rem;
-  }
-
-  .stat-label {
-    color: var(--light-gray);
-    font-size: 0.875rem;
-  }
-
-  /* Field Section */
-  .field-stats {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1.5rem;
-    background: rgba(255,255,255,0.05);
-    padding: 1rem;
-    border-radius: var(--border-radius);
-  }
-
-  .field-container {
-    position: relative;
-    width: 100%;
-    height: 250px;
-    margin: 1rem 0;
-    overflow: hidden;
-    border-radius: var(--border-radius);
-    background: linear-gradient(to bottom, #5d4037, #3e2723);
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
-  }
-
-  .field-ground {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 60px;
-    background: linear-gradient(to bottom, #4e342e, #3e2723);
-  }
-
-  .corn-plant {
-    position: absolute;
-    bottom: 60px;
-    transform-origin: bottom;
-    transition: all 1s ease;
-    z-index: 2;
-  }
-
-  .corn-stalk {
-    stroke: #7cb342;
-    stroke-width: 3;
-    stroke-linecap: round;
-  }
-
-  .corn-ear {
-    fill: #fdd835;
-    transform-origin: center;
-  }
-
-  .corn-leaf {
-    fill: #8bc34a;
-  }
-
-  /* Corn Animation */
-  @keyframes cornGrow {
-    0% { transform: scale(0.5); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  @keyframes cornShake {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(5deg); }
-    75% { transform: rotate(-5deg); }
-  }
-
-  @keyframes cornHarvest {
-    0% { transform: translateY(0) scale(1); opacity: 1; }
-    100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
-  }
-
-  /* Mode Selector */
-  .mode-selector {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin: 1rem auto;
-    max-width: 800px;
-    padding: 0 1.5rem;
-  }
-
-  .mode-btn {
-    padding: 1rem 2rem;
-    border: none;
-    border-radius: var(--border-radius);
-    font-weight: bold;
-    cursor: pointer;
-    transition: var(--transition);
-    position: relative;
-    overflow: hidden;
-    font-size: 1rem;
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    min-width: 150px;
-    max-width: 250px;
-  }
-
-  .mode-btn.active {
-    background: var(--primary);
-    color: var(--dark);
-    box-shadow: 0 4px 0 #1e8449;
-  }
-
-  .mode-btn:not(.active) {
-    background: var(--gray);
-    color: var(--light);
-    box-shadow: 0 4px 0 #2c3e50;
-  }
-
-  .mode-btn:hover:not(.active) {
-    background: #34495e;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 0 #2c3e50;
-  }
-
-  .mode-btn i {
-    font-size: 1.2rem;
-  }
-
-  /* PVP Section */
-  .pvp-container {
-    display: none;
-  }
-
-  .pvp-wheel-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
-
-  .pvp-wheel-container.active {
-    opacity: 1;
-    pointer-events: all;
-  }
-
-  .pvp-wheel {
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: conic-gradient(
-      #e74c3c 0% 50%,
-      #2ecc71 50% 100%
-    );
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    transform: rotate(0deg);
-    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-  }
-
-  .pvp-wheel-center {
-    width: 50px;
-    height: 50px;
-    background: white;
-    border-radius: 50%;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  }
-
-  .pvp-wheel-pointer {
-    position: absolute;
-    top: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 40px solid #f1c40f;
-    z-index: 3;
-  }
-
-  .pvp-wheel-text {
-    position: absolute;
-    color: white;
-    font-weight: bold;
-    text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-  }
-
-  .pvp-wheel-text.lose {
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .pvp-wheel-text.win {
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .pvp-wheel-icon {
-    position: absolute;
-    font-size: 2rem;
-  }
-
-  .pvp-wheel-icon.sword {
-    bottom: 60px;
-    right: 60px;
-    color: #e74c3c;
-  }
-
-  .pvp-wheel-icon.coin {
-    top: 60px;
-    left: 60px;
-    color: #f1c40f;
-  }
-
-  .pvp-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .pvp-log {
-    background: rgba(0,0,0,0.2);
-    border-radius: var(--border-radius);
-    padding: 1rem;
-    margin-top: 1.5rem;
-    min-height: 80px;
-    font-family: 'Courier New', monospace;
-    overflow-y: auto;
-    max-height: 200px;
-  }
-
-  .pvp-log-entry {
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
-
-  .pvp-log-entry.success {
-    color: var(--success);
-  }
-
-  .pvp-log-entry.failure {
-    color: var(--danger);
-  }
-
-  /* Navigation */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 80px;
-    background: var(--darker);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.1);
-    z-index: 100;
-    display: none;
-  }
-
-  .nav-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    color: var(--light-gray);
-    font-size: 0.875rem;
-    cursor: pointer;
-    transition: var(--transition);
-    padding: 0.5rem;
-    width: 100%;
-    height: 100%;
-  }
-
-  .nav-btn i {
-    font-size: 1.5rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .nav-btn.active {
-    color: var(--primary);
-  }
-
-  .nav-btn:hover {
-    color: var(--primary);
-    transform: translateY(-3px);
-  }
-
-  /* Animations */
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-20px); }
-    60% { transform: translateY(-10px); }
-  }
-
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
+  <style>
+    :root {
+      --primary: #FBBF24;
+      --primary-dark: #D97706;
+      --secondary: #3B82F6;
+      --dark: #1A1A2E;
+      --darker: #16213E;
+      --light: #F8F9FA;
+      --gray: #4B5563;
+      --light-gray: #E5E7EB;
+      --danger: #EF4444;
+      --warning: #F59E0B;
+      --success: #10B981;
+      --border-radius: 8px;
+      --box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      --retro-border: 4px solid #FBBF24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    body {
+      margin: 0;
+      background: var(--darker);
+      color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      text-rendering: optimizeSpeed;
+    }
+
+    /* Retro Splash Screen */
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #16213E 0%, #1A1A2E 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 0.5s ease;
+      background-image: 
+        radial-gradient(circle at 25% 25%, #FBBF2444 0%, transparent 20%),
+        radial-gradient(circle at 75% 75%, #3B82F644 0%, transparent 20%);
+    }
+
+    .splash-content {
+      text-align: center;
+      width: 80%;
+      max-width: 400px;
+      border: 4px solid var(--primary);
+      padding: 2rem;
+      background: rgba(26, 26, 46, 0.8);
+      box-shadow: 0 0 0 8px rgba(26, 26, 46, 0.5),
+                  0 0 0 12px rgba(251, 191, 36, 0.3),
+                  inset 0 0 20px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .splash-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(
+        0deg,
+        transparent 0%,
+        rgba(251, 191, 36, 0.1) 50%,
+        transparent 100%
+      );
+      animation: scanline 3s linear infinite;
+    }
+
+    .splash-logo {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 3px 3px 0 rgba(0,0,0,0.3),
+                   4px 4px 0 var(--primary-dark),
+                   6px 6px 0 rgba(0,0,0,0.5);
+      letter-spacing: 2px;
+    }
+
+    .corn-icon {
+      font-size: 4rem;
+      margin: 1rem 0;
+      filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.7));
+    }
+
+    .loading-bar-container {
+      width: 100%;
+      height: 20px;
+      background: rgba(0,0,0,0.3);
+      border: 2px solid var(--primary);
+      border-radius: 0;
+      margin: 1.5rem 0;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .loading-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--primary-dark) 100%);
+      transition: width 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-bar::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: loadingShimmer 2s infinite;
+    }
+
+    .loading-text {
+      font-size: 0.8rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+      letter-spacing: 2px;
+    }
+
+    @keyframes scanline {
+      0% { transform: translateY(-100%); }
+      100% { transform: translateY(100%); }
+    }
+
+    @keyframes loadingShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Main app styles */
     .auth-container {
-      margin: 1rem;
-      padding: 1.5rem;
+      max-width: 480px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: var(--darker);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      display: none;
+      border: var(--retro-border);
+      animation: borderPulse 2s infinite;
     }
 
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-logo {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .auth-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      color: var(--light);
+    }
+
+    .auth-subtitle {
+      color: var(--light-gray);
+      margin-bottom: 2rem;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--light-gray);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(255,255,255,0.05);
+      border: 2px solid rgba(255,255,255,0.1);
+      border-radius: var(--border-radius);
+      color: var(--light);
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: var(--border-radius);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: var(--darker);
+      box-shadow: 0 4px 0 #D97706;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+
+    .btn-primary:hover {
+      background: #FCD34D;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #D97706;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #D97706;
+    }
+
+    .btn-secondary {
+      background: var(--gray);
+      color: var(--light);
+      box-shadow: 0 4px 0 #2c3e50;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary:hover {
+      background: #4B5563;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #374151;
+    }
+
+    .btn-secondary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 0 #374151;
+    }
+
+    .btn-block {
+      display: flex;
+      width: 100%;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    /* App Layout */
+    .app-container {
+      display: none;
+      flex: 1;
+      padding-bottom: 80px;
+    }
+
+    .app-header {
+      background: linear-gradient(to right, var(--darker), #1E3A8A);
+      color: var(--primary);
+      padding: 1rem;
+      font-size: 1.2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+      border-bottom: var(--retro-border);
+    }
+
+    .user-info {
+      font-size: 0.8rem;
+      color: var(--light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .user-balance {
+      color: var(--primary);
+    }
+
+    /* Profile Bubble */
+    .profile-bubble {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      border: 2px solid var(--light);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+    }
+
+    .profile-bubble:hover {
+      transform: scale(1.1);
+    }
+
+    .profile-bubble img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .profile-bubble i {
+      font-size: 1.2rem;
+      color: white;
+    }
+
+    /* Profile Modal */
+    .profile-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .profile-modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .profile-content {
+      background: var(--darker);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: var(--box-shadow);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+      border: var(--retro-border);
+    }
+
+    .profile-modal.active .profile-content {
+      transform: translateY(0);
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 3px solid var(--primary);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .profile-pic:hover {
+      transform: rotate(10deg) scale(1.05);
+    }
+
+    .profile-pic i {
+      font-size: 2rem;
+      color: var(--light-gray);
+    }
+
+    .profile-pic img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Sections */
     .section {
-      margin: 1rem;
+      margin: 1.5rem auto;
+      max-width: 800px;
+      background: var(--darker);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      box-shadow: var(--box-shadow);
+      border: var(--retro-border);
+      position: relative;
+      overflow: hidden;
     }
 
+    .section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--primary);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      color: var(--primary);
+    }
+
+    .section-title {
+      font-size: 1.3rem;
+    }
+
+    .section-icon {
+      font-size: 1.5rem;
+    }
+
+    .section-body {
+      margin-top: 1rem;
+    }
+
+    /* Stats Cards */
     .stats-grid {
-      grid-template-columns: 1fr 1fr;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      position: relative;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      background: rgba(251, 191, 36, 0.08);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(to right, var(--primary), transparent);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--light-gray);
+      font-size: 0.8rem;
+    }
+
+    /* Field Section */
+    .field-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      background: rgba(255,255,255,0.05);
+      padding: 1rem;
+      border-radius: var(--border-radius);
+    }
+
+    .field-container {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      margin: 1rem 0;
+      overflow: hidden;
+      border-radius: var(--border-radius);
+      background: linear-gradient(to bottom, #5d4037, #3e2723);
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.3);
+      border: 2px solid #8B5A2B;
+    }
+
+    .field-ground {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 60px;
+      background: linear-gradient(to bottom, #4e342e, #3e2723);
+    }
+
+    .sun {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: #FBBF24;
+      border-radius: 50%;
+      box-shadow: 0 0 30px #FBBF24;
+      animation: sunPulse 4s infinite alternate;
+    }
+
+    .rain {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      animation: rainFall 0.5s linear infinite;
+      display: none;
+    }
+
+    .rain-drop {
+      position: absolute;
+      bottom: 100%;
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(to bottom, transparent, rgba(59, 130, 246, 0.7));
+      animation: rainDrop 1s linear infinite;
+    }
+
+    .corn-plant {
+      position: absolute;
+      bottom: 60px;
+      transform-origin: bottom;
+      transition: all 1s ease;
+      z-index: 2;
+    }
+
+    .corn-stalk {
+      stroke: #7cb342;
+      stroke-width: 3;
+      stroke-linecap: round;
+    }
+
+    .corn-ear {
+      fill: #fdd835;
+      transform-origin: center;
+    }
+
+    .corn-leaf {
+      fill: #8bc34a;
+    }
+
+    /* Corn Animation */
+    @keyframes cornGrow {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes cornShake {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      75% { transform: rotate(-5deg); }
+    }
+
+    @keyframes cornGlow {
+      0% { text-shadow: 0 0 5px rgba(251, 191, 36, 0.7); }
+      100% { text-shadow: 0 0 20px rgba(251, 191, 36, 0.9); }
+    }
+
+    @keyframes cornHarvest {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100px) scale(0.5); opacity: 0; }
+    }
+
+    /* Mode Selector */
+    .mode-selector {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1rem auto;
+      max-width: 800px;
+      padding: 0 1.5rem;
+    }
+
+    .mode-btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      font-size: 0.8rem;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-width: 150px;
+      max-width: 250px;
+      z-index: 1;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.3);
+    }
+
+    .mode-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+      z-index: -1;
+    }
+
+    .mode-btn:hover::before {
+      transform: translateX(100%);
+    }
+
+    .mode-btn.active {
+      background: var(--primary);
+      color: var(--darker);
+      box-shadow: 0 4px 0 #D97706;
+    }
+
+    .mode-btn:not(.active) {
+      background: var(--gray);
+      color: var(--light);
+      box-shadow: 0 4px 0 #374151;
+    }
+
+    .mode-btn:hover:not(.active) {
+      background: #4B5563;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #374151;
+    }
+
+    .mode-btn i {
+      font-size: 1rem;
+    }
+
+    /* PVP Section */
+    .pvp-container {
+      display: none;
+    }
+
+    .pvp-wheel-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .pvp-wheel-container.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .pvp-wheel {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #EF4444 0% 50%,
+        #10B981 50% 100%
+      );
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(0,0,0,0.7);
+      transform: rotate(0deg);
+      transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+      border: 5px solid var(--primary);
+    }
+
+    .pvp-wheel-center {
+      width: 50px;
+      height: 50px;
+      background: white;
+      border-radius: 50%;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    }
+
+    .pvp-wheel-pointer {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 40px solid var(--primary);
+      z-index: 3;
+      filter: drop-shadow(0 0 5px rgba(0,0,0,0.3));
+    }
+
+    .pvp-wheel-text {
+      position: absolute;
+      color: white;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+      font-size: 0.7rem;
+    }
+
+    .pvp-wheel-text.lose {
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .pvp-wheel-text.win {
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .pvp-wheel-icon {
+      position: absolute;
+      font-size: 1.8rem;
+    }
+
+    .pvp-wheel-icon.sword {
+      bottom: 60px;
+      right: 60px;
+      color: #EF4444;
+    }
+
+    .pvp-wheel-icon.coin {
+      top: 60px;
+      left: 60px;
+      color: #FBBF24;
     }
 
     .pvp-actions {
-      grid-template-columns: 1fr;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1.5rem;
     }
 
-    .mode-selector {
+    .pvp-log {
+      background: rgba(0,0,0,0.2);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      margin-top: 1.5rem;
+      min-height: 80px;
+      font-family: 'Courier New', monospace;
+      overflow-y: auto;
+      max-height: 200px;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      font-size: 0.8rem;
+    }
+
+    .pvp-log-entry {
+      margin-bottom: 0.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .pvp-log-entry i {
+      font-size: 0.8rem;
+    }
+
+    .pvp-log-entry.success {
+      color: var(--success);
+    }
+
+    .pvp-log-entry.failure {
+      color: var(--danger);
+    }
+
+    /* Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--darker);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-top: 2px solid var(--primary);
+      z-index: 100;
+      display: none;
+    }
+
+    .nav-btn {
+      display: flex;
       flex-direction: column;
       align-items: center;
-    }
-    
-    .mode-btn {
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--light-gray);
+      font-size: 0.7rem;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 0.5rem;
       width: 100%;
-      max-width: none;
+      height: 100%;
+      position: relative;
     }
-  }
 
-  /* Utility Classes */
-  .text-center {
-    text-align: center;
-  }
+    .nav-btn::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 80%;
+      height: 3px;
+      background: var(--primary);
+      transition: transform 0.3s ease;
+    }
 
-  .text-muted {
-    color: var(--light-gray);
-  }
+    .nav-btn.active::after {
+      transform: translateX(-50%) scaleX(1);
+    }
 
-  .mt-1 { margin-top: 0.5rem; }
-  .mt-2 { margin-top: 1rem; }
-  .mt-3 { margin-top: 1.5rem; }
-  .mt-4 { margin-top: 2rem; }
+    .nav-btn i {
+      font-size: 1.4rem;
+      margin-bottom: 0.25rem;
+      transition: transform 0.3s ease;
+    }
 
-  .mb-1 { margin-bottom: 0.5rem; }
-  .mb-2 { margin-bottom: 1rem; }
-  .mb-3 { margin-bottom: 1.5rem; }
-  .mb-4 { margin-bottom: 2rem; }
+    .nav-btn.active {
+      color: var(--primary);
+    }
 
-  /* Loading Spinner */
-  .spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    border-top-color: var(--primary);
-    animation: spin 1s ease-in-out infinite;
-  }
-</style>
+    .nav-btn:hover {
+      color: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .nav-btn:hover i {
+      transform: scale(1.2);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes borderPulse {
+      0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+    }
+
+    @keyframes sunPulse {
+      0% { box-shadow: 0 0 30px #FBBF24; }
+      50% { box-shadow: 0 0 50px #FBBF24; }
+      100% { box-shadow: 0 0 30px #FBBF24; }
+    }
+
+    @keyframes rainFall {
+      from { background-position: 0 0; }
+      to { background-position: 0 20px; }
+    }
+
+    @keyframes rainDrop {
+      from { transform: translateY(-20px); }
+      to { transform: translateY(100vh); }
+    }
+
+    /* Upgrade Card */
+    .upgrade-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--border-radius);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid rgba(251, 191, 36, 0.2);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .upgrade-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .upgrade-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--primary);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .upgrade-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .upgrade-info {
+      flex: 1;
+    }
+
+    .upgrade-name {
+      margin-bottom: 0.25rem;
+      color: var(--light);
+    }
+
+    .upgrade-desc {
+      font-size: 0.7rem;
+      color: var(--light-gray);
+    }
+
+    .upgrade-btn {
+      padding: 0.5rem 1rem;
+      background: var(--primary);
+      color: var(--darker);
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      font-size: 0.7rem;
+      text-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+
+    .upgrade-btn:hover {
+      background: #FCD34D;
+      transform: translateY(-2px);
+    }
+
+    .upgrade-btn:active {
+      transform: translateY(1px);
+    }
+
+    /* Leaderboard */
+    .leaderboard {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.7rem;
+    }
+
+    .leaderboard th {
+      background: rgba(251, 191, 36, 0.1);
+      padding: 0.5rem;
+      text-align: left;
+      color: var(--primary);
+      border-bottom: 2px solid rgba(251, 191, 36, 0.3);
+    }
+
+    .leaderboard td {
+      padding: 0.75rem 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .leaderboard tr:last-child td {
+      border-bottom: none;
+    }
+
+    .leaderboard tr:hover {
+      background: rgba(255,255,255,0.03);
+    }
+
+    .leaderboard .rank {
+      color: var(--primary);
+      width: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      * {
+        font-size: 10px;
+      }
+          
+      .auth-container {
+        margin: 1rem;
+        padding: 1.5rem;
+      }
+          
+      .section {
+        padding: 1rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .pvp-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .mode-selector {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+      }
+          
+      .mode-btn {
+        width: 100%;
+        max-width: none;
+      }
+          
+      .app-header {
+        font-size: 1rem;
+      }
+          
+      .user-info {
+        font-size: 0.7rem;
+      }
+          
+      .profile-bubble {
+        width: 30px;
+        height: 30px;
+      }
+          
+      .section-title {
+        font-size: 1rem;
+      }
+          
+      .stat-value {
+        font-size: 1.2rem;
+      }
+
+      .btn, .form-control, .upgrade-btn {
+        font-size: 0.7rem;
+      }
+    }
+
+    /* Utility Classes */
+    .text-center {
+      text-align: center;
+    }
+
+    .text-muted {
+      color: var(--light-gray);
+    }
+      
+    .text-primary {
+      color: var(--primary);
+    }
+
+    .mt-1 { margin-top: 0.5rem; }
+    .mt-2 { margin-top: 1rem; }
+    .mt-3 { margin-top: 1.5rem; }
+    .mt-4 { margin-top: 2rem; }
+
+    .mb-1 { margin-bottom: 0.5rem; }
+    .mb-2 { margin-bottom: 1rem; }
+    .mb-3 { margin-bottom: 1.5rem; }
+    .mb-4 { margin-bottom: 2rem; }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+    }
+      
+    /* Achievements */
+    .achievement-badge {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), transparent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 1.3rem;
+      margin-right: 1rem;
+      flex-shrink: 0;
+    }
+      
+    .achievement-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: var(--border-radius);
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+    }
+      
+    .achievement-item:hover {
+      background: rgba(255,255,255,0.05);
+      transform: translateX(5px);
+    }
+      
+    .achievement-item.locked {
+      opacity: 0.5;
+      filter: grayscale(80%);
+    }
+      
+    /* Corn Price Chart */
+    .chart-container {
+      position: relative;
+      height: 250px;
+      width: 100%;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
 <body onload="startSplash()">
-<!-- Splash Screen -->
+<!-- Retro Splash Screen -->
 <div id="splash">
   <div class="splash-content">
     <div class="splash-logo">
       <span>CornVault</span>
     </div>
-    <div class="splash-icon">🌽</div>
-    <p class="text-muted">Growing your digital corn economy</p>
+    <div class="corn-icon">🌽</div>
+    <p class="text-muted">LOADING DIGITAL FARM...</p>
+    <div class="loading-bar-container">
+      <div class="loading-bar" id="loadingBar"></div>
+    </div>
+    <div class="loading-text" id="loadingText">INITIALIZING SYSTEMS</div>
   </div>
 </div>
 
@@ -825,6 +1246,8 @@
         <i class="fas fa-user-plus"></i> Sign Up
       </button>
     </div>
+                
+    <p class="text-center text-muted mt-3">By continuing, you agree to our Terms of Service</p>
   </form>
 </div>
 
@@ -834,7 +1257,7 @@
   <header class="app-header">
     <div>CornVault</div>
     <div class="user-info">
-      <i class="fas fa-coins"></i>
+      <i class="fas fa-coins text-primary"></i>
       <span>Balance: <span id="corns" class="user-balance">100.0000</span> CORN</span>
     </div>
     <div class="profile-bubble" onclick="toggleProfileModal()">
@@ -850,6 +1273,9 @@
     <button class="mode-btn" id="pvpModeBtn" onclick="setMode('pvp')">
       <i class="fas fa-swords"></i> PVP Mode
     </button>
+    <button class="mode-btn" id="marketModeBtn" onclick="setMode('market')">
+      <i class="fas fa-chart-line"></i> Market
+    </button>
   </div>
 
   <!-- Farmer Mode Content -->
@@ -860,7 +1286,6 @@
         <i class="fas fa-tractor section-icon"></i>
         <h3 class="section-title">Corn Field</h3>
       </div>
-      
       <div class="field-stats">
         <div>
           <div class="stat-value" id="corn-count">0</div>
@@ -870,9 +1295,15 @@
           <div class="stat-value" id="yield-rate">0.0003</div>
           <div class="stat-label">CORN per 5 sec</div>
         </div>
+        <div>
+          <div class="stat-value" id="multiplier">1x</div>
+          <div class="stat-label">Earnings Multiplier</div>
+        </div>
       </div>
 
       <div class="field-container" id="field-animation">
+        <div class="sun"></div>
+        <div class="rain" id="rainEffect"></div>
         <div class="field-ground"></div>
         <!-- Corn plants will be added here dynamically -->
         <div class="text-muted" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
@@ -889,6 +1320,45 @@
         </button>
       </div>
     </section>
+                
+    <!-- Upgrades Section -->
+    <section id="upgrades" class="section" style="display:none;">
+      <div class="section-header">
+        <i class="fas fa-rocket section-icon"></i>
+        <h3 class="section-title">Farm Upgrades</h3>
+      </div>
+      <div class="section-body">
+        <div class="upgrade-card">
+          <div class="upgrade-info">
+            <div class="upgrade-name">Better Soil</div>
+            <div class="upgrade-desc">Increase yield by 20%</div>
+          </div>
+          <button class="upgrade-btn" onclick="buyUpgrade('soil')" id="soilUpgradeBtn">
+            15 CORN
+          </button>
+        </div>
+                
+        <div class="upgrade-card">
+          <div class="upgrade-info">
+            <div class="upgrade-name">Irrigation System</div>
+            <div class="upgrade-desc">Automatic watering (+50% yield)</div>
+          </div>
+          <button class="upgrade-btn" onclick="buyUpgrade('irrigation')" id="irrigationUpgradeBtn">
+            50 CORN
+          </button>
+        </div>
+                
+        <div class="upgrade-card">
+          <div class="upgrade-info">
+            <div class="upgrade-name">Weather Controller</div>
+            <div class="upgrade-desc">Summon rain when needed (2x yield)</div>
+          </div>
+          <button class="upgrade-btn" onclick="buyUpgrade('weather')" id="weatherUpgradeBtn">
+            120 CORN
+          </button>
+        </div>
+      </div>
+    </section>
   </div>
 
   <!-- PVP Mode Content -->
@@ -898,7 +1368,6 @@
         <i class="fas fa-swords section-icon"></i>
         <h3 class="section-title">PVP Arena</h3>
       </div>
-      
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-value">50%</div>
@@ -912,11 +1381,15 @@
           <div class="stat-value">5</div>
           <div class="stat-label">Attack Cost</div>
         </div>
+        <div class="stat-card">
+          <div class="stat-value" id="repellentCount">0</div>
+          <div class="stat-label">Repellents</div>
+        </div>
       </div>
 
       <div class="section-body">
         <p class="text-muted">Challenge other farmers to steal their CORN. High risk, high reward!</p>
-        
+                
         <div class="pvp-actions">
           <button class="btn btn-primary" onclick="startPVP()" id="attack-btn">
             <i class="fas fa-bolt"></i> Attack (5 CORN)
@@ -927,59 +1400,111 @@
         </div>
 
         <div class="pvp-log" id="pvpLog">
-          <div class="pvp-log-entry text-muted">Battle log will appear here...</div>
+          <div class="pvp-log-entry text-muted">
+            <i class="fas fa-info-circle"></i> Battle log will appear here...
+          </div>
         </div>
       </div>
     </section>
+                
+    <!-- Leaderboard Section -->
+    <section id="leaderboard" class="section" style="display:none;">
+      <div class="section-header">
+        <i class="fas fa-trophy section-icon"></i>
+        <h3 class="section-title">Leaderboard</h3>
+      </div>
+      <div class="section-body">
+        <table class="leaderboard">
+          <thead>
+            <tr>
+              <th class="rank">#</th>
+              <th>Farmer</th>
+              <th>CORN</th>
+              <th>Fields</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Generated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+    
+  <!-- Market Mode Content -->
+  <div id="marketMode" class="section" style="display:none;">
+    <div class="section-header">
+      <i class="fas fa-chart-line section-icon"></i>
+      <h3 class="section-title">Corn Market</h3>
+    </div>
+
+    <div class="section-body">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="currentPrice">1.00</div>
+          <div class="stat-label">Current Price</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="priceChange">0.00%</div>
+          <div class="stat-label">24h Change</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="marketCap">1.00M</div>
+          <div class="stat-label">Market Cap</div>
+        </div>
+      </div>
+            
+      <div class="chart-container">
+        <canvas id="marketChart"></canvas>
+      </div>
+            
+      <div class="btn-group mt-3">
+        <button class="btn btn-primary" onclick="buyMarketCorn()">
+          <i class="fas fa-coins"></i> Buy CORN
+        </button>
+        <button class="btn btn-secondary" onclick="sellMarketCorn()">
+          <i class="fas fa-hand-holding-usd"></i> Sell CORN
+        </button>
+      </div>
+    </div>
   </div>
 
-  <!-- Terms Section -->
-  <section id="terms" class="section" style="display:none;">
+  <!-- Achievements Section -->
+  <section id="achievements" class="section" style="display:none;">
     <div class="section-header">
-      <i class="fas fa-file-contract section-icon"></i>
-      <h3 class="section-title">Terms & Conditions</h3>
+      <i class="fas fa-medal section-icon"></i>
+      <h3 class="section-title">Your Achievements</h3>
     </div>
-    
-    <div class="section-body">
-      <p>This is a digital simulation game. No real transactions are made within this application.</p>
-      <p class="mt-2">All CORN assets are virtual and have no real-world value.</p>
-      <p class="mt-2">By using this app, you agree to our terms of service and privacy policy.</p>
-    </div>
-  </section>
 
-  
-  <!-- How to Play Section -->
-  <section id="howto" class="section" style="display:none;">
-    <div class="section-header">
-      <i class="fas fa-seedling section-icon"></i>
-      <h3 class="section-title">Como Jogar</h3>
-    </div>
-    
     <div class="section-body">
-      <ol style="padding-left: 1.25rem;">
-        <li><strong>Compra um campo:</strong> Começa a tua aventura adquirindo o teu primeiro terreno.</li>
-        <li><strong>Planta milho:</strong> Investe os teus CORNs para cultivar e aumentar a tua produção.</li>
-        <li><strong>Ganha CORN:</strong> Colhe automaticamente a cada 5 segundos e acumula riqueza digital.</li>
-        <li><strong>Desafia outros jogadores:</strong> Usa o modo PVP para ganhar (ou perder) ainda mais CORN.</li>
-      </ol>
-      <p class="mt-2 text-muted">Tudo acontece no mundo virtual, mas a diversão é bem real!</p>
-    </div>
-  </section>
-
-<!-- Support Section -->
-  <section id="support" class="section" style="display:none;">
-    <div class="section-header">
-      <i class="fas fa-headset section-icon"></i>
-      <h3 class="section-title">Support</h3>
-    </div>
-    
-    <div class="section-body">
-      <p>Need help with your CornVault account?</p>
-      
-      <div class="mt-3">
-        <a href="mailto:support@cornvault.com" class="btn btn-secondary">
-          <i class="fas fa-envelope"></i> Email Support
-        </a>
+      <div class="achievement-item" id="firstField">
+        <div class="achievement-badge">
+          <i class="fas fa-medal"></i>
+        </div>
+        <div>
+          <div class="upgrade-name">First Field</div>
+          <div class="upgrade-desc">Purchased your first corn field</div>
+        </div>
+      </div>
+            
+      <div class="achievement-item" id="cornKing">
+        <div class="achievement-badge">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div>
+          <div class="upgrade-name">Corn King</div>
+          <div class="upgrade-desc">Own 100 corn plants</div>
+        </div>
+      </div>
+            
+      <div class="achievement-item locked" id="pvpMaster">
+        <div class="achievement-badge">
+          <i class="fas fa-swords"></i>
+        </div>
+        <div>
+          <div class="upgrade-name">PVP Master</div>
+          <div class="upgrade-desc">Win 10 PVP battles</div>
+        </div>
       </div>
     </div>
   </section>
@@ -1010,47 +1535,51 @@
         <p class="text-muted">Level: <span id="profileLevel">Bronze</span></p>
       </div>
     </div>
-    
+
     <div class="form-group">
       <label for="usernameInput" class="form-label">Username</label>
       <input type="text" id="usernameInput" class="form-control" placeholder="Enter your username">
     </div>
-    
+
     <div class="form-group">
       <label for="phoneInput" class="form-label">Phone Number</label>
       <input type="tel" id="phoneInput" class="form-control" placeholder="Enter your phone number">
     </div>
-    
+
     <div class="form-group">
       <label for="addressInput" class="form-label">Address</label>
       <input type="text" id="addressInput" class="form-control" placeholder="Enter your address">
     </div>
-    
+
     <button class="btn btn-primary btn-block mt-3" onclick="saveProfile()">
       <i class="fas fa-save"></i> Save Profile
+    </button>
+                
+    <button class="btn btn-secondary btn-block mt-2" onclick="resetGame()">
+      <i class="fas fa-trash"></i> Reset Game
     </button>
   </div>
 </div>
 
 <!-- Bottom Navigation -->
 <nav class="bottom-nav" id="navBar">
-  <button class="nav-btn active" onclick="show('hub')">
-    <i class="fas fa-home"></i>
-    <span>Dashboard</span>
+  <button class="nav-btn active" onclick="show('field')">
+    <i class="fas fa-tractor"></i>
+    <span>Field</span>
   </button>
-  <button class="nav-btn" onclick="show('terms')">
-    <i class="fas fa-file"></i>
-    <span>Terms</span>
+  <button class="nav-btn" onclick="show('pvp')">
+    <i class="fas fa-swords"></i>
+    <span>PVP</span>
   </button>
-  <button class="nav-btn" onclick="show('support')">
-    <i class="fas fa-headset"></i>
-    <span>Support</span>
+  <button class="nav-btn" onclick="show('upgrades')">
+    <i class="fas fa-rocket"></i>
+    <span>Upgrades</span>
   </button>
-
-  <button class="nav-btn" onclick="show('howto')">
-    <i class="fas fa-question-circle"></i>
-    <span>Como Jogar</span>
-  </button></nav>
+  <button class="nav-btn" onclick="show('achievements')">
+    <i class="fas fa-medal"></i>
+    <span>Achievements</span>
+  </button>
+</nav>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -1063,18 +1592,49 @@
   let historyInterval;
   let pvpSpinning = false;
   let cornBaseCost = 5.0;
-  let cornChart;
-  let chartNeedsUpdate = false;
-  let currentMode = "farmer";
+  let marketChart;
+  let yieldMultiplier = parseFloat(localStorage.getItem("yieldMultiplier")) || 1.0;
+  let hasSoilUpgrade = localStorage.getItem("hasSoilUpgrade") === "true";
+  let hasIrrigationUpgrade = localStorage.getItem("hasIrrigationUpgrade") === "true";
+  let hasWeatherUpgrade = localStorage.getItem("hasWeatherUpgrade") === "true";
+  let repellentCount = parseInt(localStorage.getItem("repellentCount")) || 0;
+  let pvpWins = parseInt(localStorage.getItem("pvpWins")) || 0;
+  let currentMode = localStorage.getItem("gameMode") || "farmer";
   let profilePic = null;
-
+    
+  // Market data
+  let cornPrice = 1.00;
+  let priceHistory = Array.from({length: 30}, () => Math.random() * 0.2 + 0.9);
+  let priceChange = 0;
+    
   // Initialize the app
   function init() {
     updateCornsDisplay();
     updateCornCount();
     updateCornPrice();
+    updateRepellentCount();
     renderCornField();
-    
+                
+    // Set initial weather state
+    if (hasWeatherUpgrade) {
+      document.getElementById('weatherUpgradeBtn').textContent = "Activate";
+      document.getElementById('weatherUpgradeBtn').onclick = toggleRain;
+    } else {
+      document.getElementById('weatherUpgradeBtn').textContent = "120 CORN";
+      document.getElementById('weatherUpgradeBtn').onclick = buyUpgrade.bind(null, 'weather');
+    }
+                
+    // Update upgrade buttons based on what's purchased
+    if (hasSoilUpgrade) {
+      document.getElementById('soilUpgradeBtn').textContent = "Purchased";
+      document.getElementById('soilUpgradeBtn').disabled = true;
+    }
+                
+    if (hasIrrigationUpgrade) {
+      document.getElementById('irrigationUpgradeBtn').textContent = "Purchased";
+      document.getElementById('irrigationUpgradeBtn').disabled = true;
+    }
+                
     // Load history from localStorage if available
     const savedHistory = localStorage.getItem("cornHistory");
     if (savedHistory) {
@@ -1090,24 +1650,156 @@
     } else {
       initializeDefaultHistory();
     }
-    
+                
+    // Load achievements
+    checkAchievements();
+                
     // Load profile data
     loadProfile();
-    
+                
     // Start earning loop if already has field
     if (hasField) {
       startEarnings();
       document.getElementById('buyFieldBtn').style.display = 'none';
       document.getElementById('buyCornBtn').style.display = 'block';
+      document.getElementById('firstField').classList.remove('locked');
     }
-    
+                
+    if (cornCount >= 100) {
+      document.getElementById('cornKing').classList.remove('locked');
+    }
+                
+    if (pvpWins >= 10) {
+      document.getElementById('pvpMaster').classList.remove('locked');
+    }
+                
     startHistoryLogging();
-    drawChart();
-    
+    initMarketChart();
+    simulateMarket();
+                
     // Set initial mode
     setMode(currentMode);
   }
-
+    
+  // Initialize market chart
+  function initMarketChart() {
+    const ctx = document.getElementById('marketChart').getContext('2d');
+    const labels = Array.from({length: priceHistory.length}, (_, i) => i);
+                
+    marketChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'CORN Price',
+          data: priceHistory,
+          borderColor: '#FBBF24',
+          backgroundColor: 'rgba(251, 191, 36, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              callback: (value) => `$${value.toFixed(2)}`
+            }
+          },
+          x: {
+            display: false
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+                
+    updateMarketDisplay();
+  }
+    
+  // Simulate market fluctuations
+  function simulateMarket() {
+    setInterval(() => {
+      // Random price movement
+      const change = (Math.random() - 0.5) * 0.05;
+      cornPrice = Math.max(0.5, Math.min(1.5, cornPrice * (1 + change)));
+      priceHistory.push(cornPrice);
+      priceHistory.shift();
+                    
+      // Calculate 24h change
+      const oldPrice = priceHistory[0];
+      priceChange = ((cornPrice - oldPrice) / oldPrice) * 100;
+                    
+      updateMarketDisplay();
+      marketChart.update();
+    }, 3000);
+  }
+    
+  // Update market display
+  function updateMarketDisplay() {
+    document.getElementById('currentPrice').textContent = cornPrice.toFixed(2);
+    document.getElementById('priceChange').textContent = priceChange.toFixed(2) + '%';
+    document.getElementById('marketCap').textContent = (cornPrice * userCorns / 1000).toFixed(2) + 'K';
+                
+    // Color coding for price change
+    const changeElement = document.getElementById('priceChange');
+    changeElement.className = priceChange >= 0 ? 'stat-value text-green-500' : 'stat-value text-red-500';
+  }
+    
+  // Buy CORN in the market
+  function buyMarketCorn() {
+    const amount = parseFloat(prompt("How much CORN do you want to buy at $" + cornPrice.toFixed(2) + " per CORN?", "10"));
+    if (!amount || isNaN(amount) || amount <= 0) return;
+                
+    const cost = amount * cornPrice;
+    if (confirm(`This will cost you $${cost.toFixed(2)}. Confirm purchase?`)) {
+      userCorns += amount;
+      updateCornsDisplay(true, amount);
+      addPvpLog(`🛒 Purchased ${amount.toFixed(2)} CORN for $${cost.toFixed(2)}`, "success");
+    }
+  }
+    
+  // Sell CORN in the market
+  function sellMarketCorn() {
+    const amount = parseFloat(prompt("How much CORN do you want to sell at $" + cornPrice.toFixed(2) + " per CORN?", userCorns.toFixed(2)));
+    if (!amount || isNaN(amount) || amount <= 0 || amount > userCorns) {
+      alert("Invalid amount!");
+      return;
+    }
+                
+    const earnings = amount * cornPrice;
+    if (confirm(`You'll receive $${earnings.toFixed(2)}. Confirm sale?`)) {
+      userCorns -= amount;
+      updateCornsDisplay();
+      addPvpLog(`💰 Sold ${amount.toFixed(2)} CORN for $${earnings.toFixed(2)}`, "success");
+    }
+  }
+    
+  // Check and update achievements
+  function checkAchievements() {
+    if (hasField) {
+      document.getElementById('firstField').classList.remove('locked');
+    }
+                
+    if (cornCount >= 100) {
+      document.getElementById('cornKing').classList.remove('locked');
+    }
+                
+    if (pvpWins >= 10) {
+      document.getElementById('pvpMaster').classList.remove('locked');
+    }
+  }
+    
   // Load profile data
   function loadProfile() {
     const profile = JSON.parse(localStorage.getItem("profile")) || {};
@@ -1115,15 +1807,18 @@
     document.getElementById('phoneInput').value = profile.phone || "";
     document.getElementById('addressInput').value = profile.address || "";
     document.getElementById('profileUsername').textContent = profile.username || "Farmer";
-    
+    document.getElementById('profileLevel').textContent = 
+      userCorns > 1000 ? "Golden" :
+      userCorns > 500 ? "Silver" : "Bronze";
+                
     if (profile.profilePic) {
       const profilePicElement = document.querySelector('.profile-pic i');
       if (profilePicElement) profilePicElement.style.display = 'none';
-      
+                    
       const img = document.createElement('img');
       img.src = profile.profilePic;
       document.querySelector('.profile-pic').appendChild(img);
-      
+                    
       const bubbleImg = document.createElement('img');
       bubbleImg.src = profile.profilePic;
       document.querySelector('.profile-bubble').innerHTML = '';
@@ -1139,10 +1834,10 @@
       address: document.getElementById('addressInput').value,
       profilePic: profilePic || JSON.parse(localStorage.getItem("profile"))?.profilePic
     };
-    
+                
     localStorage.setItem("profile", JSON.stringify(profile));
     document.getElementById('profileUsername').textContent = profile.username;
-    
+                
     if (profilePic) {
       const bubble = document.querySelector('.profile-bubble');
       bubble.innerHTML = '';
@@ -1150,8 +1845,16 @@
       img.src = profilePic;
       bubble.appendChild(img);
     }
-    
+                
     toggleProfileModal();
+  }
+    
+  // Reset game data
+  function resetGame() {
+    if (confirm("Are you sure you want to reset all game data? This cannot be undone!")) {
+      localStorage.clear();
+      window.location.reload();
+    }
   }
 
   // Change profile picture
@@ -1165,7 +1868,7 @@
       const reader = new FileReader();
       reader.onload = function(event) {
         profilePic = event.target.result;
-        
+                            
         const profilePicContainer = document.querySelector('.profile-pic');
         profilePicContainer.innerHTML = '';
         const img = document.createElement('img');
@@ -1185,19 +1888,21 @@
   function setMode(mode) {
     currentMode = mode;
     localStorage.setItem("gameMode", mode);
-    
-    if (mode === "farmer") {
-      document.getElementById('farmerMode').style.display = 'block';
-      document.getElementById('pvpMode').style.display = 'none';
-      document.getElementById('farmerModeBtn').classList.add('active');
-      document.getElementById('pvpModeBtn').classList.remove('active');
-      show('field'); // Mostrar o campo diretamente no Farmer Mode
-    } else {
-      document.getElementById('farmerMode').style.display = 'none';
-      document.getElementById('pvpMode').style.display = 'block';
-      document.getElementById('farmerModeBtn').classList.remove('active');
-      document.getElementById('pvpModeBtn').classList.add('active');
-      show('pvp'); // Mostrar a arena PVP diretamente no PVP Mode
+                
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(mode + 'ModeBtn').classList.add('active');
+                
+    document.getElementById('farmerMode').style.display = mode === 'farmer' ? 'block' : 'none';
+    document.getElementById('pvpMode').style.display = mode === 'pvp' ? 'block' : 'none';
+    document.getElementById('marketMode').style.display = mode === 'market' ? 'block' : 'none';
+                
+    // Show appropriate default section when switching modes
+    if (mode === 'farmer') {
+      show('field');
+    } else if (mode === 'pvp') {
+      show('pvp');
+    } else if (mode === 'market') {
+      show('marketMode');
     }
   }
 
@@ -1218,7 +1923,12 @@
     const el = document.getElementById("corns");
     el.innerText = userCorns.toFixed(4);
     localStorage.setItem("corns", userCorns);
-
+                
+    // Update profile level based on balance
+    document.getElementById('profileLevel').textContent = 
+      userCorns > 1000 ? "Golden" :
+      userCorns > 500 ? "Silver" : "Bronze";
+        
     if (animated && gain > 0) {
       const anim = document.createElement("span");
       anim.innerText = ` +${gain.toFixed(4)}`;
@@ -1233,21 +1943,121 @@
   // Update corn count display
   function updateCornCount() {
     document.getElementById('corn-count').textContent = cornCount;
-    document.getElementById('yield-rate').textContent = (cornCount * 0.0003).toFixed(4);
+    document.getElementById('yield-rate').textContent = (cornCount * 0.0003 * yieldMultiplier).toFixed(4);
+    document.getElementById('multiplier').textContent = yieldMultiplier.toFixed(1) + 'x';
+                
+    // Check for Corn King achievement
+    if (cornCount >= 100) {
+      document.getElementById('cornKing').classList.remove('locked');
+    }
+  }
+    
+  // Update repellent count
+  function updateRepellentCount() {
+    document.getElementById('repellentCount').textContent = repellentCount;
   }
 
   // Update corn price based on current count
   function updateCornPrice() {
-    const price = cornBaseCost * Math.pow(1.7, cornCount);
+    const price = cornBaseCost * Math.pow(1.7, cornCount/10); // Slower price growth
     document.getElementById("cornPrice").innerText = price.toFixed(2);
     return price;
+  }
+    
+  // Buy farm upgrade
+  function buyUpgrade(type) {
+    let cost = 0;
+    let success = false;
+                
+    switch(type) {
+      case 'soil':
+        cost = 15;
+        if (userCorns >= cost && !hasSoilUpgrade) {
+          userCorns -= cost;
+          hasSoilUpgrade = true;
+          yieldMultiplier *= 1.2;
+          success = true;
+          document.getElementById('soilUpgradeBtn').textContent = "Purchased";
+          document.getElementById('soilUpgradeBtn').disabled = true;
+          addPvpLog("🌱 Soil upgrade purchased! +20% yield", "success");
+        }
+        break;
+      case 'irrigation':
+        cost = 50;
+        if (userCorns >= cost && !hasIrrigationUpgrade) {
+          userCorns -= cost;
+          hasIrrigationUpgrade = true;
+          yieldMultiplier *= 1.5;
+          success = true;
+          document.getElementById('irrigationUpgradeBtn').textContent = "Purchased";
+          document.getElementById('irrigationUpgradeBtn').disabled = true;
+          addPvpLog("💧 Irrigation system installed! +50% yield", "success");
+        }
+        break;
+      case 'weather':
+        cost = 120;
+        if (userCorns >= cost && !hasWeatherUpgrade) {
+          userCorns -= cost;
+          hasWeatherUpgrade = true;
+          document.getElementById('weatherUpgradeBtn').textContent = "Activate";
+          document.getElementById('weatherUpgradeBtn').onclick = toggleRain;
+          success = true;
+          addPvpLog("☀️ Weather controller purchased! Can summon rain", "success");
+        }
+        break;
+    }
+                
+    if (success) {
+      updateCornsDisplay();
+      updateCornCount();
+      localStorage.setItem("has" + type.charAt(0).toUpperCase() + type.slice(1) + "Upgrade", "true");
+      localStorage.setItem("yieldMultiplier", yieldMultiplier);
+    } else {
+      if (userCorns < cost) {
+        alert("Not enough CORN for this upgrade!");
+      }
+    }
+  }
+    
+  // Toggle rain effect
+  function toggleRain() {
+    const rainEffect = document.getElementById('rainEffect');
+    const isRaining = rainEffect.style.display === 'block';
+                
+    if (isRaining) {
+      rainEffect.style.display = 'none';
+      yieldMultiplier /= 2;
+      document.getElementById('weatherUpgradeBtn').textContent = "Activate Rain";
+    } else {
+      // Create rain drops
+      rainEffect.innerHTML = '';
+      for (let i = 0; i < 50; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'rain-drop';
+        drop.style.left = Math.random() * 100 + '%';
+        drop.style.animationDelay = Math.random() * 2 + 's';
+        rainEffect.appendChild(drop);
+      }
+      rainEffect.style.display = 'block';
+      yieldMultiplier *= 2;
+      document.getElementById('weatherUpgradeBtn').textContent = "Stop Rain";
+                    
+      // Rain stops automatically after 30 seconds
+      setTimeout(() => {
+        if (rainEffect.style.display === 'block') {
+          toggleRain();
+        }
+      }, 30000);
+    }
+                
+    updateCornCount();
   }
 
   // Render visual corn field with SVG animations
   function renderCornField() {
     const field = document.getElementById('field-animation');
-    field.innerHTML = '<div class="field-ground"></div>';
-    
+    field.innerHTML = '<div class="sun"></div><div class="rain" id="rainEffect"></div><div class="field-ground"></div>';
+                
     if (cornCount === 0) {
       const emptyMsg = document.createElement('div');
       emptyMsg.className = 'text-muted';
@@ -1259,34 +2069,35 @@
       field.appendChild(emptyMsg);
       return;
     }
-    
+                
     // Remove empty message if exists
     const emptyMsg = field.querySelector('.text-muted');
     if (emptyMsg) field.removeChild(emptyMsg);
-    
+                
     // Calculate positions for corn plants
     const fieldWidth = field.clientWidth;
     const plantSpacing = fieldWidth / (cornCount + 1);
     const groundHeight = 60;
-    
+                
     for (let i = 0; i < cornCount; i++) {
       const plant = document.createElement('div');
       plant.className = 'corn-plant';
       plant.style.left = `${plantSpacing * (i + 1)}px`;
       plant.style.height = `${100 + Math.random() * 50}px`;
-      
+      plant.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+                    
       // Create SVG for corn plant
       const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       svg.setAttribute("width", "40");
       svg.setAttribute("height", "200");
       svg.setAttribute("viewBox", "0 0 40 200");
-      
+                    
       // Stalk
-      const stalk = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      const stalk = document.createElementNS("http://www.w3.org/2000/ssvg", "path");
       stalk.setAttribute("d", "M20 200 Q22 180 20 160 Q18 140 20 120 Q22 100 20 80 Q18 60 20 40");
       stalk.setAttribute("class", "corn-stalk");
       stalk.setAttribute("stroke-width", "3");
-      
+                    
       // Ear of corn
       const ear = document.createElementNS("http://www.w3.org/2000/svg", "ellipse");
       ear.setAttribute("cx", "20");
@@ -1294,24 +2105,24 @@
       ear.setAttribute("rx", "8");
       ear.setAttribute("ry", "15");
       ear.setAttribute("class", "corn-ear");
-      
+                    
       // Leaves
       const leaf1 = document.createElementNS("http://www.w3.org/2000/svg", "path");
       leaf1.setAttribute("d", "M20 120 Q30 110 25 90");
       leaf1.setAttribute("class", "corn-leaf");
-      
+                    
       const leaf2 = document.createElementNS("http://www.w3.org/2000/svg", "path");
       leaf2.setAttribute("d", "M20 120 Q10 110 15 90");
       leaf2.setAttribute("class", "corn-leaf");
-      
+                    
       const leaf3 = document.createElementNS("http://www.w3.org/2000/svg", "path");
       leaf3.setAttribute("d", "M20 150 Q30 130 25 110");
       leaf3.setAttribute("class", "corn-leaf");
-      
+                    
       const leaf4 = document.createElementNS("http://www.w3.org/2000/svg", "path");
       leaf4.setAttribute("d", "M20 150 Q10 130 15 110");
       leaf4.setAttribute("class", "corn-leaf");
-      
+                    
       // Add elements to SVG
       svg.appendChild(stalk);
       svg.appendChild(ear);
@@ -1319,12 +2130,17 @@
       svg.appendChild(leaf2);
       svg.appendChild(leaf3);
       svg.appendChild(leaf4);
-      
+                    
       plant.appendChild(svg);
       field.appendChild(plant);
-      
+                    
       // Animate growth
       plant.style.animation = "cornGrow 1s ease forwards";
+                    
+      // Add gentle sway animation
+      setInterval(() => {
+        plant.style.transform = `rotate(${Math.random() * 6 - 3}deg)`;
+      }, 3000 + Math.random() * 2000);
     }
   }
 
@@ -1333,15 +2149,46 @@
     if (!cornInterval) {
       cornInterval = setInterval(() => {
         if (hasField && cornCount > 0) {
-          const gain = cornCount * 0.0003;
+          const gain = cornCount * 0.0003 * yieldMultiplier;
           userCorns += gain;
           updateCornsDisplay(true, gain);
-          chartNeedsUpdate = true;
-          
+                                    
           // Add visual effect for earning
           animateCornHarvest();
+                                    
+          // Random event chance
+          if (Math.random() < 0.1) {
+            showRandomEvent();
+          }
         }
       }, 5000);
+    }
+  }
+    
+  // Show random in-game event
+  function showRandomEvent() {
+    const events = [
+      { message: "🌞 Sunny day! Your corn is growing faster today (+10% yield)", effect: 1.1, duration: 60000 },
+      { message: "🐦 Birds attacked your field! Small yield decrease (-5% yield)", effect: 0.95, duration: 30000 },
+      { message: "🌱 Your farming skills improved! Permanent +2% yield", effect: 1.02, permanent: true }
+    ];
+                
+    const event = events[Math.floor(Math.random() * events.length)];
+    addPvpLog(event.message, "success");
+                
+    if (event.permanent) {
+      yieldMultiplier *= event.effect;
+      localStorage.setItem("yieldMultiplier", yieldMultiplier);
+      updateCornCount();
+    } else {
+      const prevMultiplier = yieldMultiplier;
+      yieldMultiplier *= event.effect;
+      updateCornCount();
+                    
+      setTimeout(() => {
+        yieldMultiplier = prevMultiplier;
+        updateCornCount();
+      }, event.duration);
     }
   }
 
@@ -1349,16 +2196,16 @@
   function animateCornHarvest() {
     const field = document.getElementById('field-animation');
     const plants = field.querySelectorAll('.corn-plant');
-    
+                
     plants.forEach((plant, index) => {
       setTimeout(() => {
         const ear = plant.querySelector('.corn-ear');
         ear.style.transform = 'scale(1.1)';
         ear.style.transition = 'transform 0.3s ease';
-        
+                                  
         setTimeout(() => {
           ear.style.transform = 'scale(1)';
-          
+                                            
           // Create coin animation
           const coin = document.createElement('div');
           coin.innerHTML = '🌽';
@@ -1368,12 +2215,12 @@
           coin.style.fontSize = '20px';
           coin.style.animation = 'bounce 0.5s ease forwards';
           field.appendChild(coin);
-          
+                                            
           setTimeout(() => {
             coin.style.transform = 'translateY(-100px)';
             coin.style.opacity = '0';
             coin.style.transition = 'all 1s ease';
-            
+                                                          
             setTimeout(() => {
               field.removeChild(coin);
             }, 1000);
@@ -1389,80 +2236,12 @@
       historyInterval = setInterval(() => {
         cornHistory.push({ time: new Date(), value: userCorns });
         if (cornHistory.length > 100) cornHistory.shift();
-        
+                                  
         // Save to localStorage
         localStorage.setItem("cornHistory", JSON.stringify(cornHistory));
-        
-        chartNeedsUpdate = true;
       }, 5000);
     }
   }
-
-  // Draw chart (only when needed)
-  function drawChart() {
-    const ctx = document.getElementById('cornChart').getContext('2d');
-    const labels = cornHistory.map(item => item.time.toLocaleTimeString());
-    const data = cornHistory.map(item => item.value);
-
-    if (cornChart) {
-      // Only update data if chart exists
-      cornChart.data.labels = labels;
-      cornChart.data.datasets[0].data = data;
-      cornChart.update();
-    } else {
-      // Create new chart if it doesn't exist
-      cornChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels,
-          datasets: [{
-            label: 'CORN Balance',
-            data,
-            borderColor: '#2ecc71',
-            backgroundColor: 'rgba(46, 204, 113, 0.1)',
-            borderWidth: 2,
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: { 
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: (context) => `${context.parsed.y.toFixed(4)} CORN`
-              }
-            }
-          },
-          scales: { 
-            y: { 
-              beginAtZero: false,
-              ticks: {
-                callback: (value) => `${value.toFixed(2)} CORN`
-              }
-            },
-            x: {
-              display: false
-            }
-          },
-          interaction: {
-            intersect: false,
-            mode: 'index'
-          }
-        }
-      });
-    }
-    
-    chartNeedsUpdate = false;
-  }
-
-  // Update chart periodically if needed
-  setInterval(() => {
-    if (chartNeedsUpdate && cornChart) {
-      drawChart();
-    }
-  }, 1000);
 
   // Get random opponent name
   function getRandomOpponent() {
@@ -1479,47 +2258,52 @@
       addPvpLog("Not enough CORN to attack!", "failure");
       return;
     }
-
+                
     pvpSpinning = true;
     const opponent = getRandomOpponent();
     userCorns -= 5;
     updateCornsDisplay();
-    chartNeedsUpdate = true;
-
+                
     const attackBtn = document.getElementById('attack-btn');
-    attackBtn.innerHTML = '<span class="spinner"></span> Preparing...';
+    attackBtn.innerHTML = '<span class="spinner"></span> Attacking...';
     attackBtn.disabled = true;
-
+                
     // Show wheel
     const wheel = document.getElementById('pvpWheel');
     wheel.classList.add('active');
-
+                
     // Spin wheel after short delay
     setTimeout(() => {
       const wheelElement = document.getElementById('wheel');
       const spinDegrees = 1800 + Math.floor(Math.random() * 360); // 5 full rotations + random
-      
+                    
       wheelElement.style.transform = `rotate(${spinDegrees}deg)`;
-      
+                    
       // Determine result after spin
       setTimeout(() => {
         const normalizedDegrees = spinDegrees % 360;
         const success = normalizedDegrees > 180; // 50% chance
-        
+                                  
         if (success) {
           userCorns += 9;
+          pvpWins += 1;
+          localStorage.setItem("pvpWins", pvpWins.toString());
           updateCornsDisplay();
-          chartNeedsUpdate = true;
-          addPvpLog(`Victory against ${opponent}! +9 CORN`, "success");
+          addPvpLog(`🎉 Victory against ${opponent}! +9 CORN`, "success");
+                                                        
+          // Check for PVP Master achievement
+          if (pvpWins >= 10) {
+            document.getElementById('pvpMaster').classList.remove('locked');
+          }
         } else {
-          addPvpLog(`Failed attack against ${opponent}.`, "failure");
+          addPvpLog(`💢 Failed attack against ${opponent}.`, "failure");
         }
-        
+                                  
         // Hide wheel
         setTimeout(() => {
           wheel.classList.remove('active');
           wheelElement.style.transform = 'rotate(0deg)';
-          
+                                                        
           attackBtn.innerHTML = '<i class="fas fa-bolt"></i> Attack (5 CORN)';
           attackBtn.disabled = false;
           pvpSpinning = false;
@@ -1533,9 +2317,13 @@
     const log = document.getElementById('pvpLog');
     const entry = document.createElement('div');
     entry.className = `pvp-log-entry ${type}`;
-    entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+                
+    const icon = type === "success" ? "fa-check-circle" :
+                type === "failure" ? "fa-times-circle" : "fa-info-circle";
+                        
+    entry.innerHTML = `<i class="fas ${icon}"></i> [${new Date().toLocaleTimeString()}] ${message}`;
     log.prepend(entry);
-    
+                
     // Keep log manageable
     if (log.children.length > 10) {
       log.removeChild(log.lastChild);
@@ -1549,8 +2337,10 @@
       return;
     }
     userCorns -= 10;
+    repellentCount += 1;
+    localStorage.setItem("repellentCount", repellentCount.toString());
     updateCornsDisplay();
-    chartNeedsUpdate = true;
+    updateRepellentCount();
     addPvpLog("🛡️ Repellent purchased. Protects from 3 attacks.", "success");
   }
 
@@ -1568,12 +2358,12 @@
     hasField = true;
     localStorage.setItem("hasField", "true");
     updateCornsDisplay();
-    chartNeedsUpdate = true;
-    
+                
     document.getElementById('buyFieldBtn').style.display = 'none';
     document.getElementById('buyCornBtn').style.display = 'block';
+    document.getElementById('firstField').classList.remove('locked');
     startEarnings();
-    
+                
     addPvpLog("🌱 Field purchased! You can now plant corn.", "success");
   }
 
@@ -1591,9 +2381,13 @@
     updateCornCount();
     updateCornPrice();
     renderCornField();
-    chartNeedsUpdate = true;
-    
+                
     addPvpLog(`🌽 Corn planted! Total: ${cornCount}`, "success");
+                
+    // Check for Corn King achievement
+    if (cornCount >= 100) {
+      document.getElementById('cornKing').classList.remove('locked');
+    }
   }
 
   // Show section
@@ -1601,25 +2395,25 @@
     // Hide all sections in the current mode
     if (currentMode === "farmer") {
       document.querySelectorAll("#farmerMode .section").forEach(s => s.style.display = "none");
-    } else {
+    } else if (currentMode === "pvp") {
       document.querySelectorAll("#pvpMode .section").forEach(s => s.style.display = "none");
+    } else {
+      // For market and other universal sections
+      document.querySelectorAll(".section").forEach(s => s.style.display = "none");
     }
-    
+                
     // Show the selected section
     document.getElementById(section).style.display = "block";
-    
-    // Update active nav button (only for dashboard, terms, support)
-    if (section === "hub" || section === "terms" || section === "support") {
-      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                
+    // Update active nav button
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                
+    // For bottom nav buttons
+    if (section === "field" || section === "pvp" || section === "upgrades" || section === "achievements") {
       const activeBtn = Array.from(document.querySelectorAll('.nav-btn')).find(btn => 
-        btn.getAttribute('onclick').includes(section)
+           btn.getAttribute('onclick')?.includes(section)
       );
       if (activeBtn) activeBtn.classList.add('active');
-    }
-    
-    // Only update chart when showing hub
-    if (section === "hub" && cornChart) {
-      drawChart();
     }
   }
 
@@ -1627,12 +2421,12 @@
   function login() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-    
+                
     if (!email || !password) {
       alert("Please enter both email and password.");
       return;
     }
-    
+                
     if (localStorage.getItem("email") === email && localStorage.getItem("password") === password) {
       startApp();
     } else {
@@ -1643,12 +2437,12 @@
   function createAccount() {
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-    
+                
     if (!email || !password) {
       alert("Please enter both email and password.");
       return;
     }
-    
+                
     localStorage.setItem("email", email);
     localStorage.setItem("password", password);
     localStorage.setItem("corns", "100.0");
@@ -1656,13 +2450,13 @@
     localStorage.setItem("cornCount", "0");
     localStorage.setItem("cornHistory", JSON.stringify([]));
     localStorage.setItem("gameMode", "farmer");
-    
+                
     userCorns = 100.0;
     hasField = false;
     cornCount = 0;
     cornHistory = [];
     currentMode = "farmer";
-    
+                
     startApp();
   }
 
@@ -1674,131 +2468,50 @@
       document.getElementById('auth').style.display = 'none';
       document.getElementById('app').style.display = 'block';
       document.getElementById('navBar').style.display = 'flex';
-      
+                    
       init();
-      show('hub');
+      show('field');
     }, 500);
   }
 
   // Initialize splash screen
   function startSplash() {
-    setTimeout(() => {
-      document.getElementById('splash').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('splash').style.display = 'none';
-        document.getElementById('auth').style.display = 'block';
-      }, 500);
-    }, 2000);
+    // Animate loading bar
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingText = document.getElementById('loadingText');
+        
+    const steps = [
+      { width: 10, text: "BOOTING CORN OS" },
+      { width: 25, text: "INITIALIZING KERNELS" },
+      { width: 40, text: "LOADING FARM DATA" },
+      { width: 60, text: "VALIDATING SOIL" },
+      { width: 75, text: "PLANTING SEEDS" },
+      { width: 90, text: "ALMOST READY" },
+      { width: 100, text: "LOAD COMPLETE" }
+    ];
+        
+    let currentStep = 0;
+        
+    function animateStep() {
+      if (currentStep < steps.length) {
+        loadingBar.style.width = steps[currentStep].width + '%';
+        loadingText.textContent = steps[currentStep].text;
+        currentStep++;
+        setTimeout(animateStep, 500);
+      } else {
+        document.getElementById('splash').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('splash').style.display = 'none';
+          document.getElementById('auth').style.display = 'block';
+        }, 500);
+      }
+    }
+        
+    setTimeout(animateStep, 500);
   }
 
   // Start the app
   startSplash();
-</script>
-
-<!-- Firebase Integration -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyB1LoPAQ3pV53F5jUT5gAHmfCqodabrzoI",
-    authDomain: "cornvault-35471.firebaseapp.com",
-    projectId: "cornvault-35471",
-    storageBucket: "cornvault-35471.appspot.com",
-    messagingSenderId: "145895221221",
-    appId: "1:145895221221:web:cf528adb1e31226798b10c",
-    measurementId: "G-K3C48DXJ66"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Save user data
-  async function saveUserData(uid, data) {
-    await setDoc(doc(db, "users", uid), data);
-  }
-
-  // Load user data
-  async function loadUserData(uid) {
-    const docSnap = await getDoc(doc(db, "users", uid));
-    return docSnap.exists() ? docSnap.data() : null;
-  }
-
-  // Firebase create account
-  window.firebaseCreateAccount = async function(email, password) {
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = userCredential.user.uid;
-      const initialData = { 
-        corns: 100.0, 
-        hasField: false, 
-        cornCount: 0,
-        cornHistory: [],
-        gameMode: "farmer",
-        profile: {
-          username: "Farmer",
-          phone: "",
-          address: ""
-        }
-      };
-      await saveUserData(uid, initialData);
-      window.firebaseStartApp(initialData);
-    } catch (error) {
-      alert("Error creating account: " + error.message);
-    }
-  }
-
-  // Firebase login
-  window.firebaseLogin = async function(email, password) {
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const uid = userCredential.user.uid;
-      const userData = await loadUserData(uid);
-      if (userData) {
-        window.firebaseStartApp(userData);
-      } else {
-        alert("No user data found.");
-      }
-    } catch (error) {
-      alert("Login error: " + error.message);
-    }
-  }
-
-  // Auth state listener
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      const data = await loadUserData(user.uid);
-      if (data) {
-        window.firebaseStartApp(data);
-      }
-    }
-  });
-
-  // Firebase start app
-  window.firebaseStartApp = function(data) {
-    userCorns = data.corns;
-    hasField = data.hasField;
-    cornCount = data.cornCount;
-    cornHistory = data.cornHistory || [];
-    currentMode = data.gameMode || "farmer";
-    
-    if (data.profile) {
-      localStorage.setItem("profile", JSON.stringify(data.profile));
-    }
-    
-    document.getElementById('splash').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('splash').style.display = 'none';
-      document.getElementById('auth').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-      document.getElementById('navBar').style.display = 'flex';
-      
-      init();
-      show('hub');
-    }, 500);
-  };
 </script>
 </body>
 </html>
